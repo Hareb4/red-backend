@@ -27,6 +27,7 @@ namespace Backend.Services.PostService
             var post = _mapper.Map<Post>(newPost);
             post.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
             post.UserId = GetUserId();
+            post.Username = post.User!.Username;
             post.CreatedAt = DateTime.Now;
             
             _context.Posts.Add(post);
@@ -44,7 +45,7 @@ namespace Backend.Services.PostService
             var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId && p.User!.Id == GetUserId());
 
             if(post is null){
-                throw new Exception("Post not here.");
+                throw new Exception("Post not found.");
             }
 
             var commentsToDelete = _context.Comments.Where(c => c.PostId == postId);
@@ -87,7 +88,7 @@ namespace Backend.Services.PostService
             var post = await _context.Posts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == postId);
 
             if(post is null || post.User!.Id != GetUserId()){
-                throw new Exception("Post not here.");
+                throw new Exception("Post not found.");
             }
 
             post.Title = updatedPost.Title;
